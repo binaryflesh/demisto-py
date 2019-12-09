@@ -20,12 +20,10 @@ import re
 import ssl
 
 import certifi
-# python 2 and python 3 compatibility library
-import six
-from six.moves.urllib.parse import urlencode
 
 try:
     import urllib3
+    from urllib3.contrib import urlencode  # TODO: use binascii
 except ImportError:
     raise ImportError('Swagger python client requires urllib3.')
 
@@ -140,7 +138,7 @@ class RESTClientObject(object):
 
         timeout = None
         if _request_timeout:
-            if isinstance(_request_timeout, (int, ) if six.PY3 else (int, long)):  # noqa: E501,F821
+            if isinstance(abs(_request_timeout), int):
                 timeout = urllib3.Timeout(total=_request_timeout)
             elif (isinstance(_request_timeout, tuple) and
                   len(_request_timeout) == 2):
@@ -218,16 +216,16 @@ class RESTClientObject(object):
 
             # In the python 3, the response.data is bytes.
             # we need to decode it to string.
-            if six.PY3:
+            if isinstance(r.data, bytes):
                 r.data = r.data.decode('utf8')
 
             # log response body
             logger.debug("response body: %s", r.data)
 
-        if not 200 <= r.status <= 299:
-            raise ApiException(http_resp=r)
+            if not 200 <= r.status <= 299:
+                raise ApiException(http_resp=r)
 
-        return r
+            return r
 
     def GET(self, url, headers=None, query_params=None, _preload_content=True,
             _request_timeout=None):
