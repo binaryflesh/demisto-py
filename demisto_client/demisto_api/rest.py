@@ -20,10 +20,10 @@ import re
 import ssl
 
 import certifi
+import urllib.parse as _urllib
 
 try:
     import urllib3
-    from urllib3.contrib import urlencode  # TODO: use binascii
 except ImportError:
     raise ImportError('Swagger python client requires urllib3.')
 
@@ -152,7 +152,7 @@ class RESTClientObject(object):
             # For `POST`, `PUT`, `PATCH`, `OPTIONS`, `DELETE`
             if method in ['POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE']:
                 if query_params:
-                    url += '?' + urlencode(query_params)
+                    url += '?' + _urllib.urlencode(query_params)
                 if re.search('json', headers['Content-Type'], re.IGNORECASE):
                     request_body = None
                     if body is not None:
